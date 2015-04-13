@@ -285,6 +285,13 @@ inject_restricted(vm_map_t task_port, mach_vm_address_t base_address, char *path
     strncpy(new_sc.segname, "__RESTRICT", sizeof(new_sc.segname));
     strncpy(new_sc.sectname, "__restrict", sizeof(new_sc.sectname));
     
+    /* verify if it will fit */
+    if (header_info.free_space < (sizeof(struct segment_command_64) + sizeof(struct section_64)))
+    {
+        LOG_ERROR("Not enough space to inject new segment command.");
+        goto failure;
+    }
+    
     /* write to header */
     write_user_mem(task_port, base_address + injection_offset, (void*)&new_sg, sizeof(struct segment_command_64));
     write_user_mem(task_port, base_address + injection_offset + sizeof(struct segment_command_64), (void*)&new_sc, sizeof(struct section_64));
