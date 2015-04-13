@@ -515,7 +515,6 @@ process_target_header(vm_map_t task_port, uint8_t *header, uint32_t header_size,
     if (_vm_map_read_user(task_port, header_info->linkedit_addr + header_info->aslr_slide, (void*)header_info->linkedit_buf, header_info->linkedit_size))
     {
         LOG_ERROR("Can't read __LINKEDIT from target!");
-        _FREE(header_info->linkedit_buf, M_TEMP);
         return KERN_FAILURE;
     }
     /* set the task port */
