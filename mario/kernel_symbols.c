@@ -176,7 +176,9 @@ init_kernel_info(void)
     }
     
 success:
+    /* kernel_header is a local buffer so we can get rid of it */
     _FREE(kernel_header, M_TEMP);
+    kernel_header = NULL;
     /*
      * drop the iocount due to vnode_lookup()
      * we must do this else machine will block on shutdown/reboot
@@ -189,10 +191,12 @@ failure:
     if (kinfo->linkedit_buf)
     {
         _FREE(kinfo->linkedit_buf, M_TEMP);
+        kinfo->linkedit_buf = NULL;
     }
     if (kernel_header)
     {
         _FREE(kernel_header, M_TEMP);
+        kernel_header = NULL;
     }
     vnode_put(kernel_vnode);
     vfs_context_rele(myvfs_context);

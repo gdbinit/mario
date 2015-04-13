@@ -197,16 +197,20 @@ inject_library(vm_map_t task_port, mach_vm_address_t base_address, char *path, i
     
 success:
     _FREE(full_header, M_TEMP);
+    full_header = NULL;
     _FREE(header_info.linkedit_buf, M_TEMP);
+    header_info.linkedit_buf = NULL;
     return KERN_SUCCESS;
 failure:
     if (full_header)
     {
         _FREE(full_header, M_TEMP);
+        full_header = NULL;
     }
     if (header_info.linkedit_buf)
     {
         _FREE(header_info.linkedit_buf, M_TEMP);
+        header_info.linkedit_buf = NULL;
     }
     return KERN_FAILURE;
 }
@@ -310,16 +314,20 @@ inject_restricted(vm_map_t task_port, mach_vm_address_t base_address, char *path
     
 success:
     _FREE(full_header, M_TEMP);
+    full_header = NULL;
     _FREE(header_info.linkedit_buf, M_TEMP);
+    header_info.linkedit_buf = NULL;
     return KERN_SUCCESS;
 failure:
     if (full_header)
     {
         _FREE(full_header, M_TEMP);
+        full_header = NULL;
     }
     if (header_info.linkedit_buf)
     {
         _FREE(header_info.linkedit_buf, M_TEMP);
+        header_info.linkedit_buf = NULL;
     }
     return KERN_FAILURE;
 }
@@ -515,6 +523,9 @@ process_target_header(vm_map_t task_port, uint8_t *header, uint32_t header_size,
     if (_vm_map_read_user(task_port, header_info->linkedit_addr + header_info->aslr_slide, (void*)header_info->linkedit_buf, header_info->linkedit_size))
     {
         LOG_ERROR("Can't read __LINKEDIT from target!");
+        /* free memory and return the pointer in a clean state */
+        _FREE(header_info->linkedit_buf, M_TEMP);
+        header_info->linkedit_buf = NULL;
         return KERN_FAILURE;
     }
     /* set the task port */
